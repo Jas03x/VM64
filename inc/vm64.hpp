@@ -34,6 +34,8 @@ enum DISPLAY
     HEIGHT = 480
 };
 
+enum { RAM_SIZE = 64 * 1024 * 1024 };
+
 enum OPCODE
 {
     OP_NOP    = 0x01,

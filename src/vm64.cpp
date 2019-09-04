@@ -32,7 +32,12 @@ namespace vm
         bool running = true;
         while(running && (status == 0))
         {
-            
+            switch(io::get_status())
+            {
+                case io::status::running:    { break;                  }
+                case io::status::power_down: { running = false; break; }
+                default:                     { status = -1; break;     }
+            }
         }
 
         printf("terminating\n");

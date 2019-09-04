@@ -7,7 +7,8 @@ namespace io
     {
         error        = 0,
         initializing = 1,
-        running      = 2
+        running      = 2,
+        power_down   = 3
     };
 
     int  init();

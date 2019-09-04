@@ -68,20 +68,15 @@ void thread_func()
             {
                 switch(event.type)
                 {
-                    case SDL_QUIT:
-                    {
-                        break;
-                    }
-
-                    default:
-                    {
-                        break;
-                    }
+                    case SDL_QUIT: { running = false; break; }
+                    default:       { break;                  }
                 }
             }
             
             SDL_GL_SwapWindow(m_window);
         }
+
+        m_status.store(io::status::power_down);
 
         if (m_context != nullptr) { SDL_GL_DeleteContext(m_context); }
         if (m_window != nullptr)  { SDL_DestroyWindow(m_window);     }
@@ -108,6 +103,9 @@ int io::init()
             if(status != io::status::running)
             {
                 result = -1;
+                
+                m_thread->join();
+                delete m_thread;
             }
 
             break;
@@ -119,7 +117,8 @@ int io::init()
 
 void io::free()
 {
-    
+    m_thread->join();
+    delete m_thread;
 }
 
 int io::get_status()

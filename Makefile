@@ -7,11 +7,15 @@ DBG = "/mnt/c/Program Files (x86)/Windows Kits/10/Debuggers/x64/windbg.exe"
 
 INC_PATH  = /I "C:/Program Files (x86)/Windows Kits/10/Include/10.0.18362.0/ucrt"
 INC_PATH += /I "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.22.27905/include"
+INC_PATH += /I "C:/Users/Jas/Documents/Libraries/SDL2/include"
 INC_PATH += /I ./inc/
 
 LIB_PATH  = /LIBPATH:"C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.22.27905/lib/x64"
 LIB_PATH += /LIBPATH:"C:/Program Files (x86)/Windows Kits/10/Lib/10.0.18362.0/um/x64"
 LIB_PATH += /LIBPATH:"C:/Program Files (x86)/Windows Kits/10/Lib/10.0.18362.0/ucrt/x64"
+LIB_PATH += /LIBPATH:"C:/Users/Jas/Documents/Libraries/SDL2/lib/x64"
+
+LIBS = SDL2.lib SDL2main.lib opengl32.lib
 
 BIN = ./bin
 SRC = ./src
@@ -29,10 +33,13 @@ $(BIN)/%.o: $(SRC)/%.cpp
 	$(CC) $(CC_OPTIONS) $(INC_PATH) /Fo:$@ /c $^
 
 $(EXE): $(OBJECTS)
-	$(LINK) $(LINK_OPTIONS) $(LIB_PATH) $^ /OUT:$(BIN)/$@
+	$(LINK) $(LINK_OPTIONS) $(LIB_PATH) $(LIBS) $^ /OUT:$(BIN)/$@
 
 debug:
 	$(DBG) $(DBG_OPTIONS) $(BIN)/$(EXE)
+
+run:
+	$(BIN)/$(EXE) ./test/disk.bin
 
 .PHONY: clean
 clean:

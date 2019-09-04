@@ -1,5 +1,3 @@
-*.o
-*.pdb
-*.ilk
-*.exe
 .vscode/*
+bin/*
+test/*

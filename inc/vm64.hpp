@@ -22,7 +22,17 @@
 *   |                                             64 bit                                            |
 *   |------------------------------------------------------------------------------------------------
 *
+* Boot sequence:
+* * On startup, the VM reads the first 1024 bytes from the hard disk into the ram and starts executing
+* 
+*
 */
+
+enum DISPLAY
+{
+    WIDTH  = 640,
+    HEIGHT = 480
+};
 
 enum OPCODE
 {

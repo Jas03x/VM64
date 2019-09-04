@@ -220,17 +220,10 @@ struct JMP
     struct
     {
         uint8_t  opcode;
-        uint8_t  reserved0;
         uint8_t  addr_mode;
-        uint8_t  reserved1;
-        uint32_t reserved2;
-    } header;
-
-    struct
-    {
+        uint16_t reserved;
         uint32_t address;
-        uint64_t reserved;
-    } data;
+    } header;
 };
 
 struct BRANCH

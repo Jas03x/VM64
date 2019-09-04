@@ -23,7 +23,8 @@
 *   |------------------------------------------------------------------------------------------------
 *
 * Boot sequence:
-* * On startup, the VM reads the first 1024 bytes from the hard disk into the ram and starts executing
+* * On startup, the VM reads the first 512 bytes from the hard disk into the ram and starts executing
+* * The bootloader must have the signature "__VM64__"
 * 
 *
 */
@@ -35,6 +36,7 @@ enum DISPLAY
 };
 
 enum { RAM_SIZE = 64 * 1024 * 1024 };
+enum { BOOT_LOADER_OFFSET = 0, BOOT_LOADER_SIZE = 512 };
 
 enum OPCODE
 {

@@ -32,8 +32,25 @@ int disk::init(const char* path)
 
 int disk::free()
 {
-    fclose(m_handle);
+    return fclose(m_handle);
+}
 
-    return 0;
+int disk::read(unsigned int offset, unsigned int length, uint8_t* buffer)
+{
+    int status = 0;
+
+    if(offset + length > m_capacity)
+    {
+        status = -1; // deny the bad request
+    }
+    else
+    {
+        fseek(m_handle, offset, SEEK_SET);
+        if(fread(buffer, 1, length, m_handle) != length) {
+            status = -1;
+        }
+    }
+
+    return status;
 }
 

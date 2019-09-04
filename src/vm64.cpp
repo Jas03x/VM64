@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "io.hpp"
 #include "disk.hpp"
@@ -24,19 +25,48 @@ namespace vm
         }
     }
 
+    int load_bootloader()
+    {
+        int status = 0;
+
+        if(disk::read(BOOT_LOADER_OFFSET, BOOT_LOADER_SIZE, memory::ptr) != 0)
+        {
+            status = -1;
+            printf("error: disk read failure\n");
+        }
+        else
+        {
+            const char* BOOT_LOADER_HEADER = "__VM64__";
+            if(memcmp(memory::ptr, BOOT_LOADER_HEADER, 8) != 0)
+            {
+                status = -1;
+                printf("error: bootloader not found\n");
+            }
+        }
+
+        return status;
+    }
+
     int run()
     {
         int status = 0;
+        
         printf("initializing\n");
+        
+        memory::init();
+        status = load_bootloader();
 
-        bool running = true;
-        while(running && (status == 0))
+        if(status == 0)
         {
-            switch(io::get_status())
+            bool running = true;
+            while(running && (status == 0))
             {
-                case io::status::running:    { break;                  }
-                case io::status::power_down: { running = false; break; }
-                default:                     { status = -1; break;     }
+                switch(io::get_status())
+                {
+                    case io::status::running:    { break;                  }
+                    case io::status::power_down: { running = false; break; }
+                    default:                     { status = -1; break;     }
+                }
             }
         }
 

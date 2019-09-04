@@ -49,6 +49,7 @@ enum OPCODE
     OP_MUL    = 0x07,
     OP_DIV    = 0x08,
     OP_JMP    = 0x09,
+    OP_BRANCH = 0x0A,
     OP_MAX    = 0xFF
 };
 
@@ -230,6 +231,17 @@ struct JMP
         uint32_t address;
         uint64_t reserved;
     } data;
+};
+
+struct BRANCH
+{
+    struct
+    {
+        uint8_t  opcode;
+        uint8_t  addr_mode;
+        uint16_t reserved;
+        uint32_t address;
+    } header;
 };
 
 #endif // VM64_HPP

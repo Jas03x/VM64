@@ -4,30 +4,84 @@
 #include <stdint.h>
 
 /*
-* System Specifications:
-* * 64 MB of RAM
-* * 64 registers
-* * 64 bit instruction set
-* * 640x480 resolution
-* * 32 bit address space
-*
-* Register Layout:
-*   __________________________________________________________________________________________________
-*   |   8 bit   |   8 bit   |   8 bit   |   8 bit   |   8 bit   |   8 bit   |   8 bit   |   8 bit   |
-*   |------------------------------------------------------------------------------------------------
-*   |        16 bit         |        16 bit         |        16 bit         |        16 bit         |
-*   |------------------------------------------------------------------------------------------------
-*   |                     32 bit                    |                     32 bit                    |
-*   |------------------------------------------------------------------------------------------------
-*   |                                             64 bit                                            |
-*   |------------------------------------------------------------------------------------------------
-*
-* Boot sequence:
-* * On startup, the VM reads the first 512 bytes from the hard disk into the ram and starts executing
-* * The bootloader must have the signature "__VM64__"
-* 
-*
-*/
+ * System Specifications:
+ * * 64 MB of RAM
+ * * 64 registers
+ * * 64 bit instruction set
+ * * 640x480 resolution
+ * * 32 bit address space
+ *
+ * 
+ * Register Layout:
+ *    _______________________________________________________________________________________________
+ *   |   8 bit   |   8 bit   |   8 bit   |   8 bit   |   8 bit   |   8 bit   |   8 bit   |   8 bit   |
+ *   |-----------------------------------------------------------------------------------------------|
+ *   |        16 bit         |        16 bit         |        16 bit         |        16 bit         |
+ *   |-----------------------------------------------------------------------------------------------|
+ *   |                     32 bit                    |                     32 bit                    |
+ *   |-----------------------------------------------------------------------------------------------|
+ *   |                                             64 bit                                            |
+ *   |-----------------------------------------------------------------------------------------------|
+ *
+ *
+ * Registers:
+ * * 64 bit registers: R01  to R64
+ * * 32 bit registers: Q001 to Q128
+ * * 16 bit registers: D001 to D256
+ * *  8 bit registers: B001 to B512
+ *
+ * 
+ * Boot sequence:
+ * * On startup, the VM reads the first 512 bytes from the hard disk into the ram at address 0, and starts executing
+ * * The bootloader must have the signature "__VM64__" at the last 8 bytes. This VM only uses disks with
+ * * sectors of size 64.
+ * 
+ *
+ * Disk:
+ * * To access the disk, you need to make an interrupt with code 0x1, with R01 having the operation, and other registers
+ * * will contain the required paramters (see the following table for more information)
+ *     __________________________________________________________________________________________________
+ *     | Operation |                                    Description                                     |
+ *     |------------------------------------------------------------------------------------------------|
+ *     |     0     |                                      Reserved                                      |
+ *     |------------------------------------------------------------------------------------------------|
+ *     |           | Query disk parameters. R01 must point to a valid memory location to where the disk |
+ *     |           | controller can write the following buffer:                                         |
+ *     |           |    _____________________________________________________________________________   |
+ *     |           |    | Offset |  Size in bytes  |      Description                               |   |
+ *     |     1     |    |---------------------------------------------------------------------------|   |
+ *     |           |    |   0    |        4        | Sector size in bytes (always 64)               |   |
+ *     |           |    |---------------------------------------------------------------------------|   |
+ *     |           |    |   1    |        4        | Number of sectors                              |   |
+ *     |           |    |---------------------------------------------------------------------------|   |
+ *     |------------------------------------------------------------------------------------------------|
+ *     |           | Read sectors. Note that sectors can only be read in sectors of size 64.            |
+ *     |           | Paramters:                                                                         |
+ *     |     2     |    - R02: Start sector                                                             |
+ *     |           |    - R03: Number of sectors to read                                                |
+ *     |           |    - R04: Pointer to destination buffer                                            |
+ *     |------------------------------------------------------------------------------------------------|
+ *     |           | Write sectors. Note that sectors can only be written to in sector sizes of 64.     |
+ *     |           | Paramters:                                                                         |
+ *     |     3     |    - R02: Start sector                                                             |
+ *     |           |    - R03: Number of sectors to write to                                            |
+ *     |           |    - R04: Pointer to source buffer                                                 |
+ *     |------------------------------------------------------------------------------------------------|
+ *
+ *
+ * Graphics core:
+ *
+ *
+ * Interrupt table:
+ *   _________________________________________
+ *   |  Code |         Description           |
+ *   |---------------------------------------|
+ *   |   0   |           Reserved            |
+ *   |---------------------------------------|
+ *   |   1   |           Disk                |
+ *   |---------------------------------------|
+ *
+**/
 
 enum DISPLAY
 {
@@ -117,10 +171,15 @@ struct MOV
     {
         uint8_t  opcode;
         uint8_t  reserved0;
-        uint16_t reg_src;
         uint16_t reg_dst;
-        uint16_t reserved1;
+        uint8_t  op_type;
+        uint8_t  reserved1;
     } header;
+
+    struct
+    {
+        uint64_t value;
+    } data;
 };
 
 struct ADD

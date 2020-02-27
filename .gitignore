@@ -1,5 +1,4 @@
-.vscode/*
 bin/*
-test/*
+*.DS_Store
+.vs/**
 *.swp
-.DS_Store
